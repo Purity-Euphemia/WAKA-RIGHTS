@@ -4,6 +4,8 @@ import com.WakaRights.dto.EvidenceRequestDTO;
 import com.WakaRights.dto.EvidenceResponseDTO;
 import com.WakaRights.model.Evidence;
 import com.WakaRights.repository.EvidenceRepository;
+import com.WakaRights.utils.FileEncryptionUtil;
+import com.WakaRights.utils.HashUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
