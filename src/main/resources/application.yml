@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: WakaRightsBackend
+
+  # -----------------------
+  # DATABASE CONFIGURATION
+  # -----------------------
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wakarights
+    username: postgres
+    password: your_db_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    open-in-view: false
+
+  # -----------------------
+  # H2 CONSOLE (DEV ONLY)
+  # -----------------------
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# -----------------------
+# JWT CONFIGURATION
+# -----------------------
+jwt:
+  secret: your_super_secret_jwt_key_here
+  expiration-ms: 86400000
+
+# -----------------------
+# LOGGING
+# -----------------------
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.wakarights: DEBUG
+
+# -----------------------
+# SERVER CONFIG
+# -----------------------
+server:
+  port: 8080
+  error:
+    include-message: always
