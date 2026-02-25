@@ -1,4 +1,7 @@
 package com.WakaRights.model;
 
-public class EvidenceStatus {
+public enum EvidenceStatus {
+    RECORDED,
+    SYNCED,
+    SHARED_WITH_LAWYER
 }

@@ -1,4 +1,5 @@
 package com.WakaRights.model;
 
-public class EvidenceType {
+public enum EvidenceType {
+    AUDIO, IMAGE, VIDEO, TEXT
 }
