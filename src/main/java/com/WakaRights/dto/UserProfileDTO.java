@@ -1,4 +1,3 @@
 package com.WakaRights.dto;
 
-public class UserProfileDTO {
-}
+public record UserProfileDTO(String fullName, String phone) {}
