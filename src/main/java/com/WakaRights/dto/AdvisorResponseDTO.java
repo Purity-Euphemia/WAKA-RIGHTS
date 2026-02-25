@@ -1,4 +1,3 @@
 package com.WakaRights.dto;
 
-public class AdvisorResponseDTO {
-}
+public record AdvisorResponseDTO(String answer) {}

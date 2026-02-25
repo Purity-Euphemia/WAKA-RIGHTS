@@ -15,7 +15,7 @@ import java.util.UUID;
 public class LegalQuery {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) 
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private UUID userId;
