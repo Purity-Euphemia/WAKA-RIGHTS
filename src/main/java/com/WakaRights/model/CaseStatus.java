@@ -1,4 +1,8 @@
 package com.WakaRights.model;
 
-public class CaseStatus {
+public enum CaseStatus {
+    REPORTED,
+    LAWYER_ASSIGNED,
+    PETITION_FILED,
+    CLOSED
 }
