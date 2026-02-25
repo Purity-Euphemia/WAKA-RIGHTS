@@ -1,4 +1,46 @@
 package com.WakaRights.service;
 
-public class EvidenceServiceImpl {
+import com.WakaRights.dto.EvidenceRequestDTO;
+import com.WakaRights.dto.EvidenceResponseDTO;
+import com.WakaRights.model.Evidence;
+import com.WakaRights.repository.EvidenceRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class EvidenceServiceImpl implements EvidenceService {
+
+    private final EvidenceRepository repository;
+
+    public EvidenceServiceImpl(EvidenceRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    public EvidenceResponseDTO save(EvidenceRequestDTO dto, UUID userId) {
+
+        Evidence e = new Evidence();
+        e.setUserId(userId);
+        e.setLegalQueryId(dto.legalQueryId());
+        e.setType(dto.type());
+        e.setFilePath(FileEncryptionUtil.save(dto.base64File()));
+        e.setHash(HashUtil.sha256(dto.base64File()));
+
+        repository.save(e);
+
+        return new EvidenceResponseDTO(
+                e.getId(), e.getType(), e.getStatus(), e.isSynced()
+        );
+    }
+
+    @Override
+    public List<EvidenceResponseDTO> getUserEvidence(UUID userId) {
+        return repository.findByUserId(userId)
+                .stream()
+                .map(e -> new EvidenceResponseDTO(
+                        e.getId(), e.getType(), e.getStatus(), e.isSynced()))
+                .toList();
+    }
 }

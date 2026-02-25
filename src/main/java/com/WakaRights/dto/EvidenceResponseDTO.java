@@ -1,4 +1,13 @@
 package com.WakaRights.dto;
 
-public class EvidenceResponseDTO {
-}
+import com.WakaRights.model.EvidenceStatus;
+import com.WakaRights.model.EvidenceType;
+
+import java.util.UUID;
+
+public record EvidenceResponseDTO(
+        UUID id,
+        EvidenceType type,
+        EvidenceStatus status,
+        boolean synced
+) {}

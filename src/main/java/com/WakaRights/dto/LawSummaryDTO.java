@@ -1,4 +1,3 @@
 package com.WakaRights.dto;
 
-public class LawSummaryDTO {
-}
+public record LawSummaryDTO(String topic, String summary) {}
