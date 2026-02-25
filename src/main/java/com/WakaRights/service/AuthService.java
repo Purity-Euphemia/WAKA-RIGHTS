@@ -1,4 +1,9 @@
 package com.WakaRights.service;
 
-public class AuthService {
+import com.WakaRights.dto.AuthResponseDTO;
+import com.WakaRights.dto.RegisterRequestDTO;
+
+public interface AuthService {
+    AuthResponseDTO register(RegisterRequestDTO registerRequestDTO);
+    AuthResponseDTO login(RegisterRequestDTO registerRequestDTO);
 }
