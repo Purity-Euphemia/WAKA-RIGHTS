@@ -9,6 +9,7 @@ import com.WakaRights.utils.FileEncryptionUtil;
 import com.WakaRights.utils.HashUtil;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +38,8 @@ public class EvidenceServiceImpl implements EvidenceService {
         e.setFilePath(FileEncryptionUtil.save(dto.base64File()));
         e.setHash(HashUtil.sha256(dto.base64File()));
 
+        assignTimestamp(e);
+
         repository.save(e);
 
         return new EvidenceResponseDTO(
@@ -61,5 +64,11 @@ public class EvidenceServiceImpl implements EvidenceService {
                         e.getStatus(),
                         e.isSynced()))
                 .toList();
+    }
+
+    public void assignTimestamp(Evidence evidence) {
+        if (evidence != null) {
+            evidence.setCreatedAt(Instant.now());
+        }
     }
 }

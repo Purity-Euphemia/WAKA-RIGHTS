@@ -60,4 +60,10 @@ class EvidencesServiceTest {
         UUID userId = UUID.randomUUID();
         assertThrows(EvidenceException.class, () -> evidenceService.save(null, userId));
     }
+    @Test
+    void shouldAssignTimestamp() {
+        Evidence e = new Evidence();
+        evidenceService.assignTimestamp(e);
+        assertNotNull(e.getCreatedAt());
+    }
 }
