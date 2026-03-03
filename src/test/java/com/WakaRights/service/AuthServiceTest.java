@@ -31,7 +31,7 @@ class AuthServiceTest {
                 new JwtUtil()
         );
     }
-    
+
     static class FakeJwtUtil extends JwtUtil {
         @Override
         public String generateToken(String email) {
@@ -47,7 +47,6 @@ class AuthServiceTest {
                 .thenReturn(false);
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-
         JwtUtil fakeJwtUtil = new FakeJwtUtil();
         AuthServicesImpl testService =
                 new AuthServicesImpl(userRepository, passwordEncoder, fakeJwtUtil);
@@ -68,5 +67,13 @@ class AuthServiceTest {
             authServicesImpl.register(request);
         });
         assertEquals("Email already exists", exception.getMessage());
+    }
+
+    @Test
+    void shouldEncodePassword() {
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashed = encoder.encode("password");
+        assertNotNull(hashed);
+        assertTrue(encoder.matches("password", hashed));
     }
 }
