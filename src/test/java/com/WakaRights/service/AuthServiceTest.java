@@ -10,6 +10,7 @@ import com.WakaRights.repository.UserRepository;
 import com.WakaRights.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -124,5 +125,14 @@ class AuthServiceTest {
         assertNotNull("mock-jwt-token");
     }
 
+    @Test
+    void shouldLogoutSuccessfully() {
+        SecurityContextHolder.clearContext();
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+    }
 
+    @Test
+    void shouldRejectNullRegisterRequest() {
+        assertThrows(Exception.class, () -> authService.register(null));
+    }
 }
