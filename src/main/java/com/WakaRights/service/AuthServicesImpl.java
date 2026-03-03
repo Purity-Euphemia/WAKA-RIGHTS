@@ -29,10 +29,9 @@ public class AuthServicesImpl implements AuthService {
     @Override
     public AuthResponseDTO register(RegisterRequestDTO request) {
 
-        userRepository.findByEmail(request.email())
-                .ifPresent(u -> {
-                    throw new AuthException("Email exists");
-                });
+        if (userRepository.existsByEmail(request.email())) {
+            throw new AuthException("Email already exists");
+        }
 
         User user = new User();
         user.setEmail(request.email());
@@ -42,7 +41,7 @@ public class AuthServicesImpl implements AuthService {
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponseDTO(token, "Account created");
+        return new AuthResponseDTO(token, "Registration successful");
     }
 
     @Override
