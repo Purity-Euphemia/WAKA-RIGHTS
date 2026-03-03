@@ -30,7 +30,6 @@ public class EvidenceServiceImpl implements EvidenceService {
         if (userId == null) {
             throw new EvidenceException("User ID cannot be null");
         }
-
         Evidence e = new Evidence();
         e.setUserId(userId);
         e.setLegalQueryId(dto.legalQueryId());
@@ -55,7 +54,6 @@ public class EvidenceServiceImpl implements EvidenceService {
         if (userId == null) {
             throw new EvidenceException("User ID cannot be null");
         }
-
         return repository.findByUserId(userId)
                 .stream()
                 .map(e -> new EvidenceResponseDTO(
@@ -64,6 +62,20 @@ public class EvidenceServiceImpl implements EvidenceService {
                         e.getStatus(),
                         e.isSynced()))
                 .toList();
+    }
+
+    public EvidenceResponseDTO getById(UUID id) {
+        if (id == null) {
+            throw new EvidenceException("Evidence ID cannot be null");
+        }
+        Evidence e = repository.findById(id)
+                .orElseThrow(() -> new EvidenceException("Evidence not found"));
+        return new EvidenceResponseDTO(
+                e.getId(),
+                e.getType(),
+                e.getStatus(),
+                e.isSynced()
+        );
     }
 
     public void assignTimestamp(Evidence evidence) {

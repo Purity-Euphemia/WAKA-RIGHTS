@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,4 +79,16 @@ class EvidencesServiceTest {
         e.lock();
         assertTrue(e.isLocked());
     }
+    @Test
+    void shouldFetchEvidenceById() {
+        UUID id = UUID.randomUUID();
+        Evidence evidence = new Evidence();
+        evidence.setId(id);
+        when(repository.findById((UUID) any()))
+                .thenReturn(Optional.of(evidence));
+        EvidenceResponseDTO response = evidenceService.getById(id);
+        assertNotNull(response);
+        assertEquals(id, response.id());
+    }
+
 }
