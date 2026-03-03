@@ -66,4 +66,16 @@ class EvidencesServiceTest {
         evidenceService.assignTimestamp(e);
         assertNotNull(e.getCreatedAt());
     }
+    @Test
+    void shouldStoreEvidenceType() {
+        Evidence e = new Evidence();
+        e.setType(EvidenceType.AUDIO);
+        assertEquals(EvidenceType.AUDIO, e.getType());
+    }
+    @Test
+    void shouldMarkEvidenceImmutable() {
+        Evidence e = new Evidence();
+        e.lock();
+        assertTrue(e.isLocked());
+    }
 }

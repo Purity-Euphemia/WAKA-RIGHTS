@@ -17,7 +17,7 @@ import java.util.UUID;
 public class Evidence {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) // Use just @GeneratedValue if Spring Boot 2
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private UUID userId;
@@ -32,8 +32,8 @@ public class Evidence {
 
     @Enumerated(EnumType.STRING)
     private EvidenceStatus status;
-
     private Instant createdAt;
+    private boolean locked = false;
 
     @PrePersist
     void onCreate() {
@@ -41,6 +41,15 @@ public class Evidence {
         synced = false;
         status = EvidenceStatus.RECORDED;
     }
+
+    public void lock() {
+        this.locked = true;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -68,31 +77,52 @@ public class Evidence {
     public Instant getCreatedAt() {
         return createdAt;
     }
-    public void setId(UUID id) {
-        this.id = id;
-    }
+
+    public void setId(UUID id) { this.id = id; }
+
     public void setUserId(UUID userId) {
+        checkLocked();
         this.userId = userId;
     }
+
     public void setLegalQueryId(UUID legalQueryId) {
+        checkLocked();
         this.legalQueryId = legalQueryId;
     }
+
     public void setType(EvidenceType type) {
+        checkLocked();
         this.type = type;
     }
+
     public void setFilePath(String filePath) {
+        checkLocked();
         this.filePath = filePath;
     }
+
     public void setHash(String hash) {
+        checkLocked();
         this.hash = hash;
     }
+
     public void setSynced(boolean synced) {
+        checkLocked();
         this.synced = synced;
     }
+
     public void setStatus(EvidenceStatus status) {
+        checkLocked();
         this.status = status;
     }
+
     public void setCreatedAt(Instant createdAt) {
+        checkLocked();
         this.createdAt = createdAt;
+    }
+
+    private void checkLocked() {
+        if (locked) {
+            throw new IllegalStateException("Evidence is locked and cannot be modified");
+        }
     }
 }
