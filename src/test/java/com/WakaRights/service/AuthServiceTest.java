@@ -112,4 +112,10 @@ class AuthServiceTest {
         LoginRequestDTO request = new LoginRequestDTO("missing@mail.com", "any-password");
         assertThrows(AuthException.class, () -> authService.login(request));
     }
+    @Test
+    void shouldAssignDefaultRole() {
+        User user = new User();
+        user.setRole(Role.USER);
+        assertEquals(Role.USER, user.getRole());
+    }
 }
