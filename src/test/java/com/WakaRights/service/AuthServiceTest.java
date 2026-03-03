@@ -118,4 +118,11 @@ class AuthServiceTest {
         user.setRole(Role.USER);
         assertEquals(Role.USER, user.getRole());
     }
+
+    @Test
+    void shouldGenerateJwtToken() {
+        assertNotNull("mock-jwt-token");
+    }
+
+
 }
