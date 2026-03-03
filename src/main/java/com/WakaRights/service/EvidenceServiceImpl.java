@@ -2,6 +2,7 @@ package com.WakaRights.service;
 
 import com.WakaRights.dto.EvidenceRequestDTO;
 import com.WakaRights.dto.EvidenceResponseDTO;
+import com.WakaRights.exception.EvidenceException;
 import com.WakaRights.model.Evidence;
 import com.WakaRights.repository.EvidenceRepository;
 import com.WakaRights.utils.FileEncryptionUtil;
@@ -22,6 +23,12 @@ public class EvidenceServiceImpl implements EvidenceService {
 
     @Override
     public EvidenceResponseDTO save(EvidenceRequestDTO dto, UUID userId) {
+        if (dto == null) {
+            throw new EvidenceException("Evidence cannot be null");
+        }
+        if (userId == null) {
+            throw new EvidenceException("User ID cannot be null");
+        }
 
         Evidence e = new Evidence();
         e.setUserId(userId);
@@ -33,16 +40,26 @@ public class EvidenceServiceImpl implements EvidenceService {
         repository.save(e);
 
         return new EvidenceResponseDTO(
-                e.getId(), e.getType(), e.getStatus(), e.isSynced()
+                e.getId(),
+                e.getType(),
+                e.getStatus(),
+                e.isSynced()
         );
     }
 
     @Override
     public List<EvidenceResponseDTO> getUserEvidence(UUID userId) {
+        if (userId == null) {
+            throw new EvidenceException("User ID cannot be null");
+        }
+
         return repository.findByUserId(userId)
                 .stream()
                 .map(e -> new EvidenceResponseDTO(
-                        e.getId(), e.getType(), e.getStatus(), e.isSynced()))
+                        e.getId(),
+                        e.getType(),
+                        e.getStatus(),
+                        e.isSynced()))
                 .toList();
     }
 }

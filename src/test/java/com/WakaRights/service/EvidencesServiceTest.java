@@ -57,6 +57,7 @@ class EvidencesServiceTest {
     }
     @Test
     void shouldRejectNullEvidence() {
-        assertThrows(EvidenceException.class, () -> evidenceService.save(null));
+        UUID userId = UUID.randomUUID();
+        assertThrows(EvidenceException.class, () -> evidenceService.save(null, userId));
     }
 }
