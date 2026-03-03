@@ -1,7 +1,10 @@
 package com.WakaRights.service;
 
 import com.WakaRights.dto.AuthResponseDTO;
+import com.WakaRights.dto.LoginRequestDTO;
 import com.WakaRights.dto.RegisterRequestDTO;
+import com.WakaRights.exception.AuthException;
+import com.WakaRights.model.Role;
 import com.WakaRights.model.User;
 import com.WakaRights.repository.UserRepository;
 import com.WakaRights.security.JwtUtil;
@@ -9,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,9 +27,8 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
-        passwordEncoder = new BCryptPasswordEncoder();
+        passwordEncoder = mock(PasswordEncoder.class);
 
-        // Default service (used for second test)
         authServicesImpl = new AuthServicesImpl(
                 userRepository,
                 passwordEncoder,
@@ -76,4 +80,53 @@ class AuthServiceTest {
         assertNotNull(hashed);
         assertTrue(encoder.matches("password", hashed));
     }
+
+    @Test
+    void shouldLoginSuccessfully() {
+        User user = new User();
+        user.setEmail("test@mail.com");
+        user.setPassword("hashed");
+        user.setRole(Role.USER);
+        when(userRepository.findByEmail("test@mail.com"))
+                .thenReturn(Optional.of(user));
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        when(passwordEncoder.matches("password123", "hashed")).thenReturn(true);
+        JwtUtil fakeJwtUtil = new JwtUtil() {
+            @Override
+            public String generateToken(String email) {
+                return "fake-jwt-token";
+            }
+        };
+        AuthServicesImpl authService =
+                new AuthServicesImpl(userRepository, passwordEncoder, fakeJwtUtil);
+        LoginRequestDTO request =
+                new LoginRequestDTO("test@mail.com", "password123");
+        AuthResponseDTO response = authService.login(request);
+        assertNotNull(response);
+        assertEquals("fake-jwt-token", response.token());
+        assertEquals("Login successful", response.message());
+    }
+
+    @Test
+    void shouldFailLoginWithWrongPassword() {
+        User user = new User();
+        user.setEmail("test@mail.com");
+        user.setPassword("hashed-password");
+        when(userRepository.findByEmail("test@mail.com"))
+                .thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong-password", "hashed-password"))
+                .thenReturn(false);
+        JwtUtil fakeJwtUtil = new JwtUtil() {
+            @Override
+            public String generateToken(String email) {
+                return "fake-token";
+            }
+        };
+        AuthServicesImpl authService =
+                new AuthServicesImpl(userRepository, passwordEncoder, fakeJwtUtil);
+        LoginRequestDTO request =
+                new LoginRequestDTO("test@mail.com", "wrong-password");
+        assertThrows(AuthException.class, () -> authService.login(request));
+    }
+
 }
