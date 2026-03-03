@@ -2,6 +2,7 @@ package com.WakaRights.service;
 
 import com.WakaRights.dto.EvidenceRequestDTO;
 import com.WakaRights.dto.EvidenceResponseDTO;
+import com.WakaRights.exception.EvidenceException;
 import com.WakaRights.model.Evidence;
 import com.WakaRights.model.EvidenceType;
 import com.WakaRights.repository.EvidenceRepository;
@@ -39,10 +40,8 @@ class EvidencesServiceTest {
         );
         try (MockedStatic<FileEncryptionUtil> mockedFileUtil = mockStatic(FileEncryptionUtil.class);
              MockedStatic<HashUtil> mockedHashUtil = mockStatic(HashUtil.class)) {
-
             mockedFileUtil.when(() -> FileEncryptionUtil.save(anyString()))
                     .thenReturn("fake/path/file.pdf");
-
             mockedHashUtil.when(() -> HashUtil.sha256(anyString()))
                     .thenReturn("fakehash");
             when(repository.save(any(Evidence.class))).thenAnswer(invocation -> {
@@ -55,5 +54,9 @@ class EvidencesServiceTest {
             assertNotNull(response.id(), "ID should not be null");
             assertEquals(EvidenceType.PDF, response.type());
         }
+    }
+    @Test
+    void shouldRejectNullEvidence() {
+        assertThrows(EvidenceException.class, () -> evidenceService.save(null));
     }
 }
