@@ -91,4 +91,18 @@ class EvidencesServiceTest {
         assertEquals(id, response.id());
     }
 
+    @Test
+    void shouldFailIfEvidenceNotFound() {
+        UUID id = UUID.randomUUID();
+        assertThrows(EvidenceException.class, () -> evidenceService.getById(id));
+    }
+    @Test
+    void shouldAttachUser() {
+        Evidence e = new Evidence();
+        UUID userId = UUID.randomUUID();
+        e.setUserId(userId);
+        assertEquals(userId, e.getUserId());
+    }
+
+
 }
