@@ -103,6 +103,10 @@ class EvidencesServiceTest {
         e.setUserId(userId);
         assertEquals(userId, e.getUserId());
     }
+    @Test
+    void shouldSyncOfflineEvidence() {
+        assertDoesNotThrow(() -> evidenceService.syncOffline());
+    }
 
 
 }

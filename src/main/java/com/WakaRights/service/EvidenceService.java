@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EvidenceService {
+
     EvidenceResponseDTO save(EvidenceRequestDTO dto, UUID userId);
     List<EvidenceResponseDTO> getUserEvidence(UUID userId);
+    EvidenceResponseDTO getById(UUID id);
+    void syncOffline();
 }
