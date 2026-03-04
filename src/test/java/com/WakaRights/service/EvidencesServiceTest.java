@@ -107,6 +107,12 @@ class EvidencesServiceTest {
     void shouldSyncOfflineEvidence() {
         assertDoesNotThrow(() -> evidenceService.syncOffline());
     }
+    @Test
+    void shouldPreventDeletion() {
+        Evidence e = new Evidence();
+        e.lock();
+        assertThrows(EvidenceException.class, () -> evidenceService.delete(e));
+    }
 
 
 }

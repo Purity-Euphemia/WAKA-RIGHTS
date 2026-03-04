@@ -12,4 +12,5 @@ public interface EvidenceService {
     List<EvidenceResponseDTO> getUserEvidence(UUID userId);
     EvidenceResponseDTO getById(UUID id);
     void syncOffline();
+    void delete(UUID id);
 }

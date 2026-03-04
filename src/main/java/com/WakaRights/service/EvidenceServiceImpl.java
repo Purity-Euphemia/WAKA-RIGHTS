@@ -101,4 +101,16 @@ public class EvidenceServiceImpl implements EvidenceService {
             repository.save(evidence);
         }
     }
+    @Override
+    public void delete(UUID id) {
+        if (id == null) {
+            throw new EvidenceException("Evidence ID cannot be null");
+        }
+        Evidence evidence = repository.findById(id)
+                .orElseThrow(() -> new EvidenceException("Evidence not found"));
+        if (evidence.isLocked()) {
+            throw new EvidenceException("Locked evidence cannot be deleted");
+        }
+        repository.delete(evidence);
+    }
 }
