@@ -24,4 +24,11 @@ public class JwtUtilTest {
         assertTrue(jwtUtil.validate(token));
         assertEquals("user@test.com", jwtUtil.extractEmail(token));
     }
+    @Test
+    void shouldExtractUsername() {
+        JwtUtil jwtUtil = new JwtUtil();
+        String token = jwtUtil.generateToken("user"); // generate a real token
+        assertEquals("user", jwtUtil.extractEmail(token)); // use extractEmail instead
+    }
+
 }
