@@ -34,4 +34,13 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
+    public boolean validate(String token) {
+        try {
+            extractEmail(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

@@ -2,8 +2,7 @@ package com.WakaRights.security;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JwtUtilTest {
 
@@ -17,5 +16,12 @@ public class JwtUtilTest {
         assertEquals("user@test.com", jwtUtil.extractEmail(token));
     }
     @Test
-    void
+    void shouldGenerateAndValidateToken() {
+        JwtUtil jwtUtil = new JwtUtil();
+        String token = jwtUtil.generateToken("user@test.com");
+
+        assertNotNull(token);
+        assertTrue(jwtUtil.validate(token));
+        assertEquals("user@test.com", jwtUtil.extractEmail(token));
+    }
 }
