@@ -109,9 +109,12 @@ class EvidencesServiceTest {
     }
     @Test
     void shouldPreventDeletion() {
+        UUID id = UUID.randomUUID();
         Evidence e = new Evidence();
+        e.setId(id);
         e.lock();
-        assertThrows(EvidenceException.class, () -> evidenceService.delete(e));
+        when(repository.findById(id)).thenReturn(Optional.of(e));
+        assertThrows(EvidenceException.class, () -> evidenceService.delete(id));
     }
 
 
