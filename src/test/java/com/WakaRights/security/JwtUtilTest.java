@@ -44,6 +44,8 @@ public class JwtUtilTest {
         assertFalse(jwtUtil.validate("invalid.token"));
     }
     @Test
-    void 
+    void shouldContainClaims() {
+        assertNotNull(jwtUtil.extractClaims("valid.token"));
+    }
 
 }
