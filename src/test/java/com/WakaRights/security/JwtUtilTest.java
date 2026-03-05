@@ -60,5 +60,9 @@ public class JwtUtilTest {
     void shouldHandleNullToken() {
         assertFalse(jwtUtil.validate(null));
     }
+    @Test
+    void shouldHandleEmptyToken() {
+        assertFalse(jwtUtil.validate(""));
+    }
 
 }
