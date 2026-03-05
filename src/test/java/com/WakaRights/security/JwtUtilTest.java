@@ -56,5 +56,9 @@ public class JwtUtilTest {
     void shouldSetExpiration() {
         assertTrue(jwtUtil.getExpiration() > 0);
     }
+    @Test
+    void shouldHandleNullToken() {
+        assertFalse(jwtUtil.validate(null));
+    }
 
 }
