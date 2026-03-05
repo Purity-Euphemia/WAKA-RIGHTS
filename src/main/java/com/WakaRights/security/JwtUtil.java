@@ -15,9 +15,10 @@ public class JwtUtil {
 
     public JwtUtil() {
         this.key = Keys.hmacShaKeyFor("waka_rights_secret_waka_rights_secret".getBytes(StandardCharsets.UTF_8));
-        // Note: HS256 requires at least 256-bit key (32 bytes), so string must be long enough
     }
-
+    public SecretKey getKey() {
+        return key;
+    }
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)

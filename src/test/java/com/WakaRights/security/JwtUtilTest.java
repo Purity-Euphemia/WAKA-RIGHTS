@@ -48,5 +48,9 @@ public class JwtUtilTest {
         String token = jwtUtil.generateToken("user");
         assertNotNull(jwtUtil.extractClaims(token));
     }
+    @Test
+    void shouldUseSecretKey() {
+        assertNotNull(jwtUtil.getKey());
+    }
 
 }
