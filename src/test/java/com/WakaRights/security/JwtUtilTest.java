@@ -1,5 +1,6 @@
 package com.WakaRights.security;
 
+import com.WakaRights.model.Evidence;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Test;
@@ -38,5 +39,11 @@ public class JwtUtilTest {
     void shouldRejectExpiredToken() {
         assertFalse(jwtUtil.validate("expired.token"));
     }
+    @Test
+    void shouldRejectInvalidToken() {
+        assertFalse(jwtUtil.validate("invalid.token"));
+    }
+    @Test
+    void 
 
 }
