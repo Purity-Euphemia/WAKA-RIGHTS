@@ -12,12 +12,16 @@ import java.util.Date;
 public class JwtUtil {
 
     private final SecretKey key;
+    private final long expiration = 86400000;
 
     public JwtUtil() {
         this.key = Keys.hmacShaKeyFor("waka_rights_secret_waka_rights_secret".getBytes(StandardCharsets.UTF_8));
     }
     public SecretKey getKey() {
         return key;
+    }
+    public long getExpiration() {
+        return expiration;
     }
     public String generateToken(String email) {
         return Jwts.builder()

@@ -52,5 +52,9 @@ public class JwtUtilTest {
     void shouldUseSecretKey() {
         assertNotNull(jwtUtil.getKey());
     }
+    @Test
+    void shouldSetExpiration() {
+        assertTrue(jwtUtil.getExpiration() > 0);
+    }
 
 }
