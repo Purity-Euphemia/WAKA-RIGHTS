@@ -92,4 +92,9 @@ public class authControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    void wrongHttpMethod() throws Exception {
+        mockMvc.perform(get("/api/auth/login"))
+                .andExpect(status().isMethodNotAllowed());
+    }
 }
