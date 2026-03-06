@@ -65,12 +65,18 @@ public class authControllerTest {
         when(authService.login(any()))
                 .thenThrow(new AuthException("Invalid credentials"));
         mockMvc.perform(post("/api/auth/login")
-                        .with(csrf()) 
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {"email":"wrong@mail.com","password":"wrong"}
                     """))
                 .andExpect(status().isUnauthorized());
+    }
+    @Test
+    void logoutSuccess() throws Exception {
+        mockMvc.perform(post("/api/auth/logout")
+                        .with(csrf())) // <--- add this!
+                .andExpect(status().isOk());
     }
 
 
