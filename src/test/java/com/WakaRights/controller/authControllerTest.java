@@ -97,4 +97,10 @@ public class authControllerTest {
         mockMvc.perform(get("/api/auth/login"))
                 .andExpect(status().isMethodNotAllowed());
     }
+    @Test
+    void emptyBody() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)) 
+                .andExpect(status().isBadRequest());
+    }
 }
