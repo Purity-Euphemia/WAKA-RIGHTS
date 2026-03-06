@@ -1,6 +1,7 @@
 package com.WakaRights.controller;
 
 
+import com.WakaRights.dto.AuthResponseDTO;
 import com.WakaRights.security.SecurityConfig;
 import com.WakaRights.service.AuthService;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +45,17 @@ public class authControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isBadRequest());
+    }
+    @Test
+    void loginSuccess() throws Exception {
+        AuthResponseDTO response = new AuthResponseDTO("jwt-token", "Login successful");
+        when(authService.login(any())).thenReturn(response);
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                {"email":"test@mail.com","password":"123456"}
+            """))
+                .andExpect(status().isOk());
     }
 
 
