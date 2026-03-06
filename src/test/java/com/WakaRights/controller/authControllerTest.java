@@ -100,7 +100,20 @@ public class authControllerTest {
     @Test
     void emptyBody() throws Exception {
         mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)) 
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+    @Test
+    void invalidJson() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{invalid"))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    void missingContentType() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .content("{\"email\":\"test@mail.com\",\"password\":\"123456\"}"))
+                .andExpect(status().isUnsupportedMediaType());
     }
 }
