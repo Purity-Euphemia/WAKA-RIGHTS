@@ -2,6 +2,9 @@ package com.WakaRights.controller;
 
 
 import com.WakaRights.dto.AuthResponseDTO;
+import com.WakaRights.dto.LoginRequestDTO;
+import com.WakaRights.exception.AuthException;
+import com.WakaRights.exception.GlobalExceptionHandler;
 import com.WakaRights.security.SecurityConfig;
 import com.WakaRights.service.AuthService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, GlobalExceptionHandler.class})
 public class authControllerTest {
 
     @Autowired
@@ -56,6 +59,18 @@ public class authControllerTest {
                 {"email":"test@mail.com","password":"123456"}
             """))
                 .andExpect(status().isOk());
+    }
+    @Test
+    void loginFail() throws Exception {
+        when(authService.login(any()))
+                .thenThrow(new AuthException("Invalid credentials"));
+        mockMvc.perform(post("/api/auth/login")
+                        .with(csrf()) 
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"email":"wrong@mail.com","password":"wrong"}
+                    """))
+                .andExpect(status().isUnauthorized());
     }
 
 
