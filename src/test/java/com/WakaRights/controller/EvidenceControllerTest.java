@@ -130,5 +130,34 @@ class EvidenceControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+    @Test
+    void saveEvidence_largeQueryId() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        UUID evidenceId = UUID.randomUUID();
+        EvidenceResponseDTO response = new EvidenceResponseDTO(
+                evidenceId,
+                EvidenceType.TEXT,
+                EvidenceStatus.PENDING,
+                true
+        );
+        when(evidenceService.save(any(EvidenceRequestDTO.class), any(UUID.class)))
+                .thenReturn(response);
+        String requestJson = """
+            {
+                "legalQueryId":"%s",
+                "type":"TEXT",
+                "base64File":"largeFileData"
+            }
+            """.formatted(UUID.randomUUID());
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(requestJson)
+                        .with(user(principal))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("TEXT"));
+    }
+
 
 }
