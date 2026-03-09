@@ -1,0 +1,68 @@
+package com.WakaRights.controller;
+
+import com.WakaRights.dto.EvidenceRequestDTO;
+import com.WakaRights.dto.EvidenceResponseDTO;
+import com.WakaRights.model.EvidenceStatus;
+import com.WakaRights.model.EvidenceType;
+import com.WakaRights.security.UserPrincipal;
+import com.WakaRights.service.EvidenceService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+@WebMvcTest(EvidenceController.class)
+class EvidenceControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private EvidenceService evidenceService;
+
+    @Test
+    void uploadEvidence_authenticated() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        UUID evidenceId = UUID.randomUUID();
+        EvidenceResponseDTO response = new EvidenceResponseDTO(
+                evidenceId,
+                EvidenceType.PDF,
+                EvidenceStatus.PENDING,
+                true
+        );
+        when(evidenceService.save(any(EvidenceRequestDTO.class), any(UUID.class)))
+                .thenReturn(response);
+        String requestJson = """
+                {
+                    "legalQueryId":"%s",
+                    "type":"PDF",
+                    "base64File":"base64dummy"
+                }
+                """.formatted(UUID.randomUUID());
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(requestJson)
+                        .with(user(principal))
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(evidenceId.toString()))
+                .andExpect(jsonPath("$.type").value("PDF"))
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.synced").value(true));
+    }
+}
