@@ -2,6 +2,7 @@ package com.WakaRights.controller;
 
 import com.WakaRights.dto.EvidenceRequestDTO;
 import com.WakaRights.dto.EvidenceResponseDTO;
+import com.WakaRights.model.Evidence;
 import com.WakaRights.model.EvidenceStatus;
 import com.WakaRights.model.EvidenceType;
 import com.WakaRights.security.UserPrincipal;
@@ -16,13 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(EvidenceController.class)
 class EvidenceControllerTest {
@@ -99,6 +103,21 @@ class EvidenceControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.legalQueryId").value("legalQueryId is required"))
                 .andExpect(jsonPath("$.base64File").value("base64File is required"));
+    }
+    @Test
+    void myEvidence_serviceCalled() throws Exception {
+
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+
+        when(evidenceService.getUserEvidence(userId))
+                .thenReturn(List.of());
+
+        mockMvc.perform(get("/api/evidence")
+                        .with(user(principal)))
+                .andExpect(status().isOk());
+
+        verify(evidenceService, times(1)).getUserEvidence(userId);
     }
 
 }
