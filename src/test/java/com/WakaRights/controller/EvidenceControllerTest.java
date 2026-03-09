@@ -77,8 +77,28 @@ class EvidenceControllerTest {
         mockMvc.perform(post("/api/evidence")
                         .contentType("application/json")
                         .content(requestJson)
-                        .with(csrf()) // CSRF is required even for unauthenticated
+                        .with(csrf())
                 )
                 .andExpect(status().isUnauthorized());
     }
+    @Test
+    void uploadEvidence_invalidRequest() throws Exception {
+
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+
+        String invalidJson = """
+        { "type":"PDF" }
+        """;
+
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(invalidJson)
+                        .with(user(principal))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.legalQueryId").value("legalQueryId is required"))
+                .andExpect(jsonPath("$.base64File").value("base64File is required"));
+    }
+
 }

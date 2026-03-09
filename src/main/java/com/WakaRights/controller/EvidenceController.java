@@ -4,6 +4,7 @@ import com.WakaRights.dto.EvidenceRequestDTO;
 import com.WakaRights.dto.EvidenceResponseDTO;
 import com.WakaRights.security.UserPrincipal;
 import com.WakaRights.service.EvidenceService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class EvidenceController {
     @PostMapping
     public EvidenceResponseDTO upload(
             @AuthenticationPrincipal UserPrincipal user,
-            @RequestBody EvidenceRequestDTO dto) {
+            @Valid @RequestBody EvidenceRequestDTO dto) {
         return service.save(dto, user.getId());
     }
 
