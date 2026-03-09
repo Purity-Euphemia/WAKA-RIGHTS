@@ -119,5 +119,16 @@ class EvidenceControllerTest {
 
         verify(evidenceService, times(1)).getUserEvidence(userId);
     }
+    @Test
+    void myEvidence_emptyList() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        when(evidenceService.getUserEvidence(userId))
+                .thenReturn(List.of());
+        mockMvc.perform(get("/api/evidence")
+                        .with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
 
 }
