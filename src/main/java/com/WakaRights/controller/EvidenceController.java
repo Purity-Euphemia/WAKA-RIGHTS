@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/evidence")
@@ -31,5 +32,12 @@ public class EvidenceController {
     public List<EvidenceResponseDTO> myEvidence(
             @AuthenticationPrincipal UserPrincipal user) {
         return service.getUserEvidence(user.getId());
+    }
+    @DeleteMapping("/{id}")
+    public void deleteEvidence(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserPrincipal user) {
+
+        service.delete(id);
     }
 }

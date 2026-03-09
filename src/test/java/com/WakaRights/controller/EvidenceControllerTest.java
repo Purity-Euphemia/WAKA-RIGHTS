@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 @WebMvcTest(EvidenceController.class)
 class EvidenceControllerTest {
@@ -157,6 +158,101 @@ class EvidenceControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type").value("TEXT"));
+    }
+    @Test
+    void saveEvidence_audioType() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        EvidenceResponseDTO response = new EvidenceResponseDTO(
+                UUID.randomUUID(),
+                EvidenceType.AUDIO,
+                EvidenceStatus.PENDING,
+                true
+        );
+        when(evidenceService.save(any(EvidenceRequestDTO.class), any(UUID.class)))
+                .thenReturn(response);
+        String requestJson = """
+            {
+                "legalQueryId":"%s",
+                "type":"AUDIO",
+                "base64File":"audioFile"
+            }
+            """.formatted(UUID.randomUUID());
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(requestJson)
+                        .with(user(principal))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("AUDIO"));
+    }
+    @Test
+    void saveEvidence_videoType() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+
+        EvidenceResponseDTO response = new EvidenceResponseDTO(
+                UUID.randomUUID(),
+                EvidenceType.VIDEO,
+                EvidenceStatus.PENDING,
+                true
+        );
+        when(evidenceService.save(any(EvidenceRequestDTO.class), any(UUID.class)))
+                .thenReturn(response);
+        String requestJson = """
+            {
+                "legalQueryId":"%s",
+                "type":"VIDEO",
+                "base64File":"videoFile"
+            }
+            """.formatted(UUID.randomUUID());
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(requestJson)
+                        .with(user(principal))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("VIDEO"));
+    }
+    @Test
+    void saveEvidence_largeFile() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        String largeFile = "A".repeat(10000);
+        EvidenceResponseDTO response = new EvidenceResponseDTO(
+                UUID.randomUUID(),
+                EvidenceType.TEXT,
+                EvidenceStatus.PENDING,
+                true
+        );
+        when(evidenceService.save(any(EvidenceRequestDTO.class), any(UUID.class)))
+                .thenReturn(response);
+        String requestJson = """
+            {
+                "legalQueryId":"%s",
+                "type":"TEXT",
+                "base64File":"%s"
+            }
+            """.formatted(UUID.randomUUID(), largeFile);
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(requestJson)
+                        .with(user(principal))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("TEXT"));
+    }
+    @Test
+    void deleteEvidence_success() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        UUID evidenceId = UUID.randomUUID();
+        doNothing().when(evidenceService).delete(evidenceId);
+        mockMvc.perform(delete("/api/evidence/{id}", evidenceId)
+                        .with(user(principal))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+        verify(evidenceService, times(1)).delete(evidenceId);
     }
 
 
