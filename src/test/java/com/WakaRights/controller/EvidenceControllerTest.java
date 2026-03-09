@@ -65,4 +65,20 @@ class EvidenceControllerTest {
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.synced").value(true));
     }
+    @Test
+    void uploadEvidence_unauthenticated() throws Exception {
+        String requestJson = """
+                {
+                    "legalQueryId":"%s",
+                    "type":"PDF",
+                    "base64File":"base64dummy"
+                }
+                """.formatted(UUID.randomUUID());
+        mockMvc.perform(post("/api/evidence")
+                        .contentType("application/json")
+                        .content(requestJson)
+                        .with(csrf()) // CSRF is required even for unauthenticated
+                )
+                .andExpect(status().isUnauthorized());
+    }
 }
