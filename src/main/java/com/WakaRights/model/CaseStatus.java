@@ -5,5 +5,6 @@ public enum CaseStatus {
     LAWYER_ASSIGNED,
     PETITION_FILED,
     CLOSED,
-    OPEN
+    OPEN,
+    IN_PROGRESS
 }

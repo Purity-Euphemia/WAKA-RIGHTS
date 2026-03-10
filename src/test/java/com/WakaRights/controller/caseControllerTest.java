@@ -144,7 +144,7 @@ public class caseControllerTest {
         UUID user1 = UUID.randomUUID();
         UUID user2 = UUID.randomUUID();
         fakeService.data = List.of(new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()));
-        
+
         UserPrincipal principal1 = new UserPrincipal(user1, "user1@test.com");
         mockMvc.perform(get("/api/cases").with(user(principal1)))
                 .andExpect(status().isOk())
@@ -155,5 +155,34 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
+    @Test
+    void myCases_checkCreatedAtIsRecent() throws Exception {
+        UUID userId = UUID.randomUUID();
+        Instant now = Instant.now();
+        fakeService.data = List.of(new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, now));
+        UserPrincipal principal = new UserPrincipal(userId, "recent@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].createdAt").value(now.toString()));
+    }
+    @Test
+    void myCases_nullUserThrowsException() throws Exception {
+        mockMvc.perform(get("/api/cases")) // no user
+                .andExpect(status().is5xxServerError());
+    }
+    @Test
+    void myCases_mixedStatuses() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()),
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.IN_PROGRESS, Instant.now()),
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.CLOSED, Instant.now())
+        );
+        UserPrincipal principal = new UserPrincipal(userId, "mixed@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
+    }
+
 
 }
