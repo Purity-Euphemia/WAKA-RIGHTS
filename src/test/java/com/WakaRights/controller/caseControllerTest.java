@@ -139,5 +139,21 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(50));
     }
+    @Test
+    void myCases_diffUsersDoNotShareData() throws Exception {
+        UUID user1 = UUID.randomUUID();
+        UUID user2 = UUID.randomUUID();
+        fakeService.data = List.of(new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()));
+        
+        UserPrincipal principal1 = new UserPrincipal(user1, "user1@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+
+        UserPrincipal principal2 = new UserPrincipal(user2, "user2@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
 
 }
