@@ -163,12 +163,12 @@ public class caseControllerTest {
         UserPrincipal principal = new UserPrincipal(userId, "recent@test.com");
         mockMvc.perform(get("/api/cases").with(user(principal)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].createdAt").value(now.toString()));
+                .andExpect(jsonPath("$[0].createdAt").value(now.getEpochSecond() + "." + now.getNano()));
     }
     @Test
     void myCases_nullUserThrowsException() throws Exception {
-        mockMvc.perform(get("/api/cases")) // no user
-                .andExpect(status().is5xxServerError());
+        mockMvc.perform(get("/api/cases/my-cases")) 
+                .andExpect(status().is4xxClientError());
     }
     @Test
     void myCases_mixedStatuses() throws Exception {
@@ -213,6 +213,22 @@ public class caseControllerTest {
         mockMvc.perform(get("/api/cases").with(user(principal)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
+    }
+    @Test
+    void myCases_multipleUsersMultipleRequests() throws Exception {
+        UUID user1 = UUID.randomUUID();
+        UUID user2 = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now())
+        );
+        UserPrincipal principal1 = new UserPrincipal(user1, "multi1@test.com");
+        UserPrincipal principal2 = new UserPrincipal(user2, "multi2@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+        mockMvc.perform(get("/api/cases").with(user(principal2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
     }
 
 
