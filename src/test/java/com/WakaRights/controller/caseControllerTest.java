@@ -205,6 +205,15 @@ public class caseControllerTest {
                     .andExpect(jsonPath("$.length()").value(1));
         }
     }
+    @Test
+    void myCases_checkEmptyListStillReturns200() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of();
+        UserPrincipal principal = new UserPrincipal(userId, "empty200@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
 
 
 }
