@@ -126,5 +126,18 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].status").value("CLOSED"));
     }
+    @Test
+    void myCases_largeNumberOfCases() throws Exception {
+        UUID userId = UUID.randomUUID();
+        List<CaseResponseDTO> largeList = new java.util.ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            largeList.add(new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()));
+        }
+        fakeService.data = largeList;
+        UserPrincipal principal = new UserPrincipal(userId, "bulk@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(50));
+    }
 
 }
