@@ -115,5 +115,16 @@ public class caseControllerTest {
                 .andExpect(jsonPath("$[0].status").value("OPEN"))
                 .andExpect(jsonPath("$[1].status").value("CLOSED"));
     }
+    @Test
+    void myCases_returnsOnlyClosedCases() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.CLOSED, Instant.now())
+        );
+        UserPrincipal principal = new UserPrincipal(userId, "closed@test.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status").value("CLOSED"));
+    }
 
 }
