@@ -192,6 +192,19 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").exists());
     }
+    @Test
+    void myCases_multipleRequestsReturnSameData() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now())
+        );
+        UserPrincipal principal = new UserPrincipal(userId, "repeat@test.com");
+        for (int i = 0; i < 3; i++) {
+            mockMvc.perform(get("/api/cases").with(user(principal)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1));
+        }
+    }
 
 
 }
