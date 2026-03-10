@@ -62,5 +62,14 @@ public class caseControllerTest {
                 .andExpect(jsonPath("$[0].createdAt").exists())
                 .andExpect(jsonPath("$[1].createdAt").exists());
     }
+    @Test
+    void myCases_returnsEmptyList() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of();
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
 
 }
