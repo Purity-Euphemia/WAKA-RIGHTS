@@ -84,6 +84,17 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3));
     }
+    @Test
+    void myCases_responseContainsCreatedAt() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now())
+        );
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].createdAt").exists());
+    }
 
 
 }
