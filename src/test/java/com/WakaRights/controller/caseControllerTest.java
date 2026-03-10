@@ -71,5 +71,19 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+    @Test
+    void myCases_multipleCasesReturned() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()),
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()),
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.CLOSED, Instant.now())
+        );
+        UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
+        mockMvc.perform(get("/api/cases").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
+    }
+
 
 }
