@@ -23,6 +23,11 @@ public class CaseController {
     @GetMapping
     public List<CaseResponseDTO> myCases(
             @AuthenticationPrincipal UserPrincipal user) {
+
+        if (user == null) {
+            throw new RuntimeException("Authenticated user not found");
+        }
+
         return service.getUserCases(user.getId());
     }
 }
