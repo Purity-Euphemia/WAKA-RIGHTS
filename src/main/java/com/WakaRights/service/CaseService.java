@@ -23,4 +23,7 @@ public class CaseService {
                         c.getId(), c.getStatus(), c.getCreatedAt()))
                 .toList();
     }
+    public void deleteCase(UUID caseId) {
+        repository.deleteById(caseId);
+    }
 }
