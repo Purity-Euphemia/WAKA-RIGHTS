@@ -1,15 +1,16 @@
 package com.WakaRights.controller;
-
 import com.WakaRights.dto.CaseResponseDTO;
 import com.WakaRights.model.CaseStatus;
 import com.WakaRights.security.UserPrincipal;
 import com.WakaRights.service.CaseService;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,36 +18,43 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class CaseControllerTest {
+public class caseControllerTest {
 
-    @Test
-    void myCases_success() throws Exception {
+    private MockMvc mockMvc;
+    private TestCaseService fakeService;
 
-        UUID userId = UUID.randomUUID();
+    static class TestCaseService extends CaseService {
+        List<CaseResponseDTO> data = new ArrayList<>();
+        UUID receivedUserId;
+        TestCaseService() {
+            super(null);
+        }
 
-        CaseResponseDTO case1 =
-                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now());
+        @Override
+        public List<CaseResponseDTO> getUserCases(UUID userId) {
+            receivedUserId = userId;
+            return data;
+        }
+    }
 
-        CaseResponseDTO case2 =
-                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.CLOSED, Instant.now());
-
-        CaseService fakeService = new CaseService(null) {
-            @Override
-            public List<CaseResponseDTO> getUserCases(UUID id) {
-                return List.of(case1, case2);
-            }
-        };
-
+    @BeforeEach
+    void setup() {
+        fakeService = new TestCaseService();
         CaseController controller = new CaseController(fakeService);
-
-        MockMvc mockMvc = MockMvcBuilders
+        mockMvc = MockMvcBuilders
                 .standaloneSetup(controller)
                 .build();
+    }
 
+    @Test
+    void myCases_returnsCasesSuccessfully() throws Exception {
+        UUID userId = UUID.randomUUID();
+        fakeService.data = List.of(
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.OPEN, Instant.now()),
+                new CaseResponseDTO(UUID.randomUUID(), CaseStatus.CLOSED, Instant.now())
+        );
         UserPrincipal principal = new UserPrincipal(userId, "test@example.com");
-
-        mockMvc.perform(get("/api/cases")
-                        .with(user(principal)))
+        mockMvc.perform(get("/api/cases").with(user(principal)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].status").value("OPEN"))
@@ -54,4 +62,5 @@ class CaseControllerTest {
                 .andExpect(jsonPath("$[0].createdAt").exists())
                 .andExpect(jsonPath("$[1].createdAt").exists());
     }
+
 }
