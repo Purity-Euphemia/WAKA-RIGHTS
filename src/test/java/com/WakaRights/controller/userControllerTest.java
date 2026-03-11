@@ -17,6 +17,7 @@ import java.util.UUID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,4 +45,23 @@ public class userControllerTest {
                 .andExpect(jsonPath("$.fullName").value("Ada Lovelace"))
                 .andExpect(jsonPath("$.phone").value("0700000000"));
     }
+    @Test
+    void getProfile_noPrincipal_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/user/profile"))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    void updateProfile_success() throws Exception {
+        UserProfileDTO updatedProfile = new UserProfileDTO("Grace Hopper", "0800000000");
+        when(userService.updateProfile(any(), any())).thenReturn(updatedProfile);
+        String jsonBody = "{\"fullName\":\"Grace Hopper\",\"phone\":\"0800000000\"}";
+        mockMvc.perform(put("/api/user/profile")
+                        .principal((Principal) () -> "user")
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("Grace Hopper"))
+                .andExpect(jsonPath("$.phone").value("0800000000"));
+    }
+
 }
