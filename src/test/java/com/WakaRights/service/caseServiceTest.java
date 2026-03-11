@@ -88,6 +88,14 @@ public class caseServiceTest {
         List<CaseResponseDTO> result = caseService.getUserCases(userId);
         assertEquals(now, result.get(0).createdAt());
     }
+    @Test
+    void getUserCases_repositoryCalledOnce() {
+        UUID userId = UUID.randomUUID();
+        when(caseRepository.findByUserId(userId)).thenReturn(List.of());
+        caseService.getUserCases(userId);
+        verify(caseRepository, times(1)).findByUserId(userId);
+    }
+
 
 
 
