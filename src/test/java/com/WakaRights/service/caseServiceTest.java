@@ -97,9 +97,7 @@ public class caseServiceTest {
     }
     @Test
     void getUserCases_multipleCasesMappedCorrectly() {
-
         UUID userId = UUID.randomUUID();
-
         CaseFile case1 = new CaseFile();
         case1.setId(UUID.randomUUID());
         case1.setStatus(CaseStatus.OPEN);
@@ -114,6 +112,12 @@ public class caseServiceTest {
         when(caseRepository.findByUserId(userId)).thenReturn(List.of(case1, case2));
         List<CaseResponseDTO> result = caseService.getUserCases(userId);
         assertEquals(2, result.size());
+    }
+    @Test
+    void deleteCase_repositoryCalledOnce() {
+        UUID caseId = UUID.randomUUID();
+        caseService.deleteCase(caseId);
+        verify(caseRepository, times(1)).deleteById(caseId);
     }
 
 
