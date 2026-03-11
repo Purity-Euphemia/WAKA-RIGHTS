@@ -128,6 +128,19 @@ public class caseServiceTest {
         verify(caseRepository, times(1)).deleteById(caseId1);
         verify(caseRepository, times(1)).deleteById(caseId2);
     }
+    @Test
+    void getUserCases_returnsCorrectStatus() {
+        UUID userId = UUID.randomUUID();
+
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(UUID.randomUUID());
+        caseFile.setStatus(CaseStatus.CLOSED);
+        caseFile.setCreatedAt(Instant.now());
+        caseFile.setUserId(userId);
+        when(caseRepository.findByUserId(userId)).thenReturn(List.of(caseFile));
+        List<CaseResponseDTO> result = caseService.getUserCases(userId);
+        assertEquals(CaseStatus.CLOSED, result.get(0).status());
+    }
 
 
 
