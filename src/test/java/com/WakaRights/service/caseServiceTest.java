@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class caseServiceTest {
@@ -46,4 +47,14 @@ public class caseServiceTest {
         assertEquals(CaseStatus.CLOSED, result.get(1).status());
         verify(caseRepository, times(1)).findByUserId(userId);
     }
+    @Test
+    void getUserCases_returnsEmptyListWhenNoCases() {
+        UUID userId = UUID.randomUUID();
+        when(caseRepository.findByUserId(userId))
+                .thenReturn(List.of());
+        List<CaseResponseDTO> result = caseService.getUserCases(userId);
+        assertTrue(result.isEmpty());
+        verify(caseRepository, times(1)).findByUserId(userId);
+    }
+
 }
