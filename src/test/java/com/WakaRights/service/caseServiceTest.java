@@ -56,5 +56,12 @@ public class caseServiceTest {
         assertTrue(result.isEmpty());
         verify(caseRepository, times(1)).findByUserId(userId);
     }
+    @Test
+    void deleteCase_callsRepositoryDelete() {
+        UUID caseId = UUID.randomUUID();
+        caseService.deleteCase(caseId);
+        verify(caseRepository, times(1)).deleteById(caseId);
+    }
+
 
 }
