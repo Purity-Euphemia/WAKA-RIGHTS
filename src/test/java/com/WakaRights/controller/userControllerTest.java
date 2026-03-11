@@ -63,5 +63,79 @@ public class userControllerTest {
                 .andExpect(jsonPath("$.fullName").value("Grace Hopper"))
                 .andExpect(jsonPath("$.phone").value("0800000000"));
     }
+    @Test
+    void updateProfile_missingFields_returnsBadRequest() throws Exception {
+        String jsonBody = "{\"fullName\":\"\"}";
+        mockMvc.perform(put("/api/user/profile")
+                        .principal((Principal) () -> "user")
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    void getProfile_serviceThrowsException_returnsInternalServerError() throws Exception {
+        when(userService.getProfile(any())).thenThrow(new RuntimeException("Service error"));
+        mockMvc.perform(get("/api/user/profile")
+                        .principal((Principal) () -> "user"))
+                .andExpect(status().isInternalServerError());
+    }
+    @Test
+    void updateProfile_serviceThrowsException_returnsInternalServerError() throws Exception {
+        when(userService.updateProfile(any(), any())).thenThrow(new RuntimeException("Service error"));
+        String jsonBody = "{\"fullName\":\"Ada\",\"phone\":\"0700000000\"}";
+        mockMvc.perform(put("/api/user/profile")
+                        .principal((Principal) () -> "user")
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(status().isInternalServerError());
+    }
+    @Test
+    void getProfile_emptyProfile_returnsNotFound() throws Exception {
+        when(userService.getProfile(any())).thenReturn(null);
+        mockMvc.perform(get("/api/user/profile")
+                        .principal((Principal) () -> "user"))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    void updateProfile_invalidPhone_returnsBadRequest() throws Exception {
+        String jsonBody = "{\"fullName\":\"Ada Lovelace\",\"phone\":\"abc\"}";
+        mockMvc.perform(put("/api/user/profile")
+                        .principal((Principal) () -> "user")
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    void getProfile_multipleCalls_returnCorrectData() throws Exception {
+        UserProfileDTO profile1 = new UserProfileDTO("User One", "0701111111");
+        UserProfileDTO profile2 = new UserProfileDTO("User Two", "0702222222");
+        when(userService.getProfile(any()))
+                .thenReturn(profile1)
+                .thenReturn(profile2);
+        mockMvc.perform(get("/api/user/profile")
+                        .principal((Principal) () -> "user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("User One"));
+        mockMvc.perform(get("/api/user/profile")
+                        .principal((Principal) () -> "user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("User Two"));
+    }
+    @Test
+    void updateProfile_partialUpdate_success() throws Exception {
+        UserProfileDTO updatedProfile = new UserProfileDTO("Ada Lovelace", "0709999999");
+        when(userService.updateProfile(any(), any())).thenReturn(updatedProfile);
+        String jsonBody = "{\"phone\":\"0709999999\"}";
+        mockMvc.perform(put("/api/user/profile")
+                        .principal((Principal) () -> "user")
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("Ada Lovelace"))
+                .andExpect(jsonPath("$.phone").value("0709999999"));
+    }
+
+
+
 
 }
