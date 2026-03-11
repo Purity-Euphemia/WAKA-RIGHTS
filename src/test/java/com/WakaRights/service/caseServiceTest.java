@@ -119,6 +119,16 @@ public class caseServiceTest {
         caseService.deleteCase(caseId);
         verify(caseRepository, times(1)).deleteById(caseId);
     }
+    @Test
+    void deleteCase_withDifferentIds() {
+        UUID caseId1 = UUID.randomUUID();
+        UUID caseId2 = UUID.randomUUID();
+        caseService.deleteCase(caseId1);
+        caseService.deleteCase(caseId2);
+        verify(caseRepository, times(1)).deleteById(caseId1);
+        verify(caseRepository, times(1)).deleteById(caseId2);
+    }
+
 
 
 
