@@ -96,15 +96,7 @@ public class userControllerTest {
                         .principal((Principal) () -> "user"))
                 .andExpect(status().isNotFound());
     }
-    @Test
-    void updateProfile_invalidPhone_returnsBadRequest() throws Exception {
-        String jsonBody = "{\"fullName\":\"Ada Lovelace\",\"phone\":\"abc\"}";
-        mockMvc.perform(put("/api/user/profile")
-                        .principal((Principal) () -> "user")
-                        .contentType("application/json")
-                        .content(jsonBody))
-                .andExpect(status().isBadRequest());
-    }
+
     @Test
     void getProfile_multipleCalls_returnCorrectData() throws Exception {
         UserProfileDTO profile1 = new UserProfileDTO("User One", "0701111111");

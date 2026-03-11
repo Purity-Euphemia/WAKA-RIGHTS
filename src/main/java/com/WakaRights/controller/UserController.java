@@ -3,6 +3,7 @@ package com.WakaRights.controller;
 import com.WakaRights.dto.UserProfileDTO;
 import com.WakaRights.security.UserPrincipal;
 import com.WakaRights.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +16,12 @@ public class UserController {
     public UserController(UserService service) { this.service = service; }
 
     @GetMapping("/profile")
-    public UserProfileDTO getProfile(@AuthenticationPrincipal UserPrincipal user) {
-        return service.getProfile(user.getId());
+    public ResponseEntity<UserProfileDTO> getProfile(@AuthenticationPrincipal UserPrincipal user) {
+        UserProfileDTO profile = service.getProfile(user.getId());
+        if (profile == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/profile")
