@@ -95,6 +95,26 @@ public class caseServiceTest {
         caseService.getUserCases(userId);
         verify(caseRepository, times(1)).findByUserId(userId);
     }
+    @Test
+    void getUserCases_multipleCasesMappedCorrectly() {
+
+        UUID userId = UUID.randomUUID();
+
+        CaseFile case1 = new CaseFile();
+        case1.setId(UUID.randomUUID());
+        case1.setStatus(CaseStatus.OPEN);
+        case1.setCreatedAt(Instant.now());
+        case1.setUserId(userId);
+
+        CaseFile case2 = new CaseFile();
+        case2.setId(UUID.randomUUID());
+        case2.setStatus(CaseStatus.IN_PROGRESS);
+        case2.setCreatedAt(Instant.now());
+        case2.setUserId(userId);
+        when(caseRepository.findByUserId(userId)).thenReturn(List.of(case1, case2));
+        List<CaseResponseDTO> result = caseService.getUserCases(userId);
+        assertEquals(2, result.size());
+    }
 
 
 
