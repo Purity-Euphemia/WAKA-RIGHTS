@@ -6,10 +6,6 @@ import com.WakaRights.service.CaseService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,7 +17,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,6 +28,9 @@ public class caseControllerTest {
     static class TestCaseService extends CaseService {
         List<CaseResponseDTO> data = new ArrayList<>();
         UUID receivedUserId;
+
+        boolean deleteCalled = false;
+        UUID deletedId;
         TestCaseService() {
             super(null);
         }
@@ -41,6 +39,11 @@ public class caseControllerTest {
         public List<CaseResponseDTO> getUserCases(UUID userId) {
             receivedUserId = userId;
             return data;
+        }
+        @Override
+        public void deleteCase(UUID caseId) {
+            deleteCalled = true;
+            deletedId = caseId;
         }
     }
 
@@ -167,7 +170,7 @@ public class caseControllerTest {
     }
     @Test
     void myCases_nullUserThrowsException() throws Exception {
-        mockMvc.perform(get("/api/cases/my-cases")) 
+        mockMvc.perform(get("/api/cases/my-cases"))
                 .andExpect(status().is4xxClientError());
     }
     @Test
@@ -230,6 +233,12 @@ public class caseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
-
+    @Test
+    void deleteCase_callsServiceSuccessfully() {
+        UUID caseId = UUID.randomUUID();
+        fakeService.deleteCase(caseId);
+        assertEquals(true, fakeService.deleteCalled);
+        assertEquals(caseId, fakeService.deletedId);
+    }
 
 }
