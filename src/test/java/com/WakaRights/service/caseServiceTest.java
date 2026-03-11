@@ -75,6 +75,19 @@ public class caseServiceTest {
         List<CaseResponseDTO> result = caseService.getUserCases(userId);
         assertEquals(caseId, result.get(0).id());
     }
+    @Test
+    void getUserCases_returnsCorrectCreatedAt() {
+        UUID userId = UUID.randomUUID();
+        Instant now = Instant.now();
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(UUID.randomUUID());
+        caseFile.setStatus(CaseStatus.OPEN);
+        caseFile.setCreatedAt(now);
+        caseFile.setUserId(userId);
+        when(caseRepository.findByUserId(userId)).thenReturn(List.of(caseFile));
+        List<CaseResponseDTO> result = caseService.getUserCases(userId);
+        assertEquals(now, result.get(0).createdAt());
+    }
 
 
 
