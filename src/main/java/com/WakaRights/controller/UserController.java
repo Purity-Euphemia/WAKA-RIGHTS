@@ -1,6 +1,7 @@
 package com.WakaRights.controller;
 
 import com.WakaRights.dto.UserProfileDTO;
+import com.WakaRights.dto.UserProfileUpdateDTO;
 import com.WakaRights.security.UserPrincipal;
 import com.WakaRights.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class UserController {
 
     @PutMapping("/profile")
     public UserProfileDTO updateProfile(@AuthenticationPrincipal UserPrincipal user,
-                                        @RequestBody UserProfileDTO dto) {
+                                        @RequestBody UserProfileUpdateDTO dto) {
         return service.updateProfile(user.getId(), dto);
     }
 }

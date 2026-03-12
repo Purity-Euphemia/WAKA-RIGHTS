@@ -1,6 +1,7 @@
 package com.WakaRights.service;
 
 import com.WakaRights.dto.UserProfileDTO;
+import com.WakaRights.dto.UserProfileUpdateDTO;
 import com.WakaRights.model.UserProfile;
 import com.WakaRights.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,12 @@ public class UserServiceImpl implements UserService {
         return new UserProfileDTO(p.getFullName(), p.getPhone());
     }
 
-    public UserProfileDTO updateProfile(UUID userId, UserProfileDTO dto) {
+    public UserProfileDTO updateProfile(UUID userId, UserProfileUpdateDTO dto) {
         UserProfile p = repo.findByUserId(userId).orElse(new UserProfile());
         p.setUserId(userId);
-        p.setFullName(dto.fullName());
-        p.setPhone(dto.phone());
+        if (dto.fullName() != null) p.setFullName(dto.fullName());
+        if (dto.phone() != null) p.setPhone(dto.phone());
         repo.save(p);
-        return dto;
+        return new UserProfileDTO(p.getFullName(), p.getPhone());
     }
 }
