@@ -12,8 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -70,6 +69,19 @@ public class UserServiceTest {
         UUID userId = UUID.randomUUID();
         when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> userService.getProfile(userId));
+    }
+    @Test
+    void testUpdateProfile_onlyFullName() {
+        UUID userId = UUID.randomUUID();
+        UserProfile user = new UserProfile();
+        user.setUserId(userId);
+        user.setFullName("John Doe");
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserProfile.class))).thenAnswer(i -> i.getArgument(0));
+        UserProfileUpdateDTO updateDTO = new UserProfileUpdateDTO("Jane Doe", null);
+        UserProfileDTO updated = userService.updateProfile(userId, updateDTO);
+        assertEquals("Jane Doe", updated.fullName());
+        assertNull(updated.phone());
     }
 
 
