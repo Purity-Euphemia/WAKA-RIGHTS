@@ -14,12 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerStandaloneTest {
 
     private MockMvc mockMvc;
-    private AuthService authService; // mock dependency
+    private AuthService authService;
 
     @BeforeEach
     void setup() {
-        authService = Mockito.mock(AuthService.class); // create mock
-        AuthController authController = new AuthController(authService); // inject mock
+        authService = Mockito.mock(AuthService.class);
+        AuthController authController = new AuthController(authService);
         mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
     }
 
