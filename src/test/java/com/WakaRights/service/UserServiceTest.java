@@ -83,6 +83,19 @@ public class UserServiceTest {
         assertEquals("Jane Doe", updated.fullName());
         assertNull(updated.phone());
     }
+    @Test
+    void testUpdateProfile_onlyPhone() {
+        UUID userId = UUID.randomUUID();
+        UserProfile user = new UserProfile();
+        user.setUserId(userId);
+        user.setPhone("1234567890");
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserProfile.class))).thenAnswer(i -> i.getArgument(0));
+        UserProfileUpdateDTO updateDTO = new UserProfileUpdateDTO(null, "0987654321");
+        UserProfileDTO updated = userService.updateProfile(userId, updateDTO);
+        assertNull(updated.fullName());
+        assertEquals("0987654321", updated.phone());
+    }
 
 
 
