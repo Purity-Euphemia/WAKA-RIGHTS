@@ -110,6 +110,16 @@ public class UserServiceTest {
         assertEquals("John Doe", updated.fullName());
         assertEquals("1234567890", updated.phone());
     }
+    @Test
+    void testUpdateProfile_newUser_onlyFullName() {
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(userRepository.save(any(UserProfile.class))).thenAnswer(i -> i.getArgument(0));
+        UserProfileUpdateDTO updateDTO = new UserProfileUpdateDTO("FullNameOnly", null);
+        UserProfileDTO updated = userService.updateProfile(userId, updateDTO);
+        assertEquals("FullNameOnly", updated.fullName());
+        assertNull(updated.phone());
+    }
 
 
 
