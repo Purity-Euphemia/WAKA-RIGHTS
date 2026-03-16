@@ -120,6 +120,38 @@ public class UserServiceTest {
         assertEquals("FullNameOnly", updated.fullName());
         assertNull(updated.phone());
     }
+    @Test
+    void testUpdateProfile_newUser_onlyPhone() {
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(userRepository.save(any(UserProfile.class))).thenAnswer(i -> i.getArgument(0));
+        UserProfileUpdateDTO updateDTO = new UserProfileUpdateDTO(null, "9998887777");
+        UserProfileDTO updated = userService.updateProfile(userId, updateDTO);
+        assertNull(updated.fullName());
+        assertEquals("9998887777", updated.phone());
+    }
+    @Test
+    void testGetProfile_multipleUsers_independent() {
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        UserProfile user1 = new UserProfile();
+        user1.setUserId(userId1);
+        user1.setFullName("User1");
+        user1.setPhone("111");
+        UserProfile user2 = new UserProfile();
+        user2.setUserId(userId2);
+        user2.setFullName("User2");
+        user2.setPhone("222");
+        when(userRepository.findByUserId(userId1)).thenReturn(Optional.of(user1));
+        when(userRepository.findByUserId(userId2)).thenReturn(Optional.of(user2));
+        UserProfileDTO dto1 = userService.getProfile(userId1);
+        UserProfileDTO dto2 = userService.getProfile(userId2);
+        assertEquals("User1", dto1.fullName());
+        assertEquals("111", dto1.phone());
+        assertEquals("User2", dto2.fullName());
+        assertEquals("222", dto2.phone());
+    }
+
 
 
 
