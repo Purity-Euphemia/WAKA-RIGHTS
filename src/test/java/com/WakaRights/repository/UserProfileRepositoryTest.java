@@ -37,5 +37,30 @@ public class UserProfileRepositoryTest {
         Optional<UserProfile> retrieved = userProfileRepository.findByUserId(userId);
         assertTrue(retrieved.isEmpty());
     }
+    @Test
+    void testUpdateUserProfile() {
+        UUID userId = UUID.randomUUID();
+        UserProfile user = new UserProfile();
+        user.setUserId(userId);
+        user.setFullName("John Doe");
+        user.setPhone("1234567890");
+        userProfileRepository.save(user);
+        user.setFullName("Jane Doe");
+        userProfileRepository.save(user);
+        Optional<UserProfile> updated = userProfileRepository.findByUserId(userId);
+        assertTrue(updated.isPresent());
+        assertEquals("Jane Doe", updated.get().getFullName());
+    }
+    @Test
+    void testDeleteUserProfile() {
+        UUID userId = UUID.randomUUID();
+        UserProfile user = new UserProfile();
+        user.setUserId(userId);
+        user.setFullName("John Doe");
+        userProfileRepository.save(user);
+        userProfileRepository.delete(user);
+        Optional<UserProfile> deleted = userProfileRepository.findByUserId(userId);
+        assertTrue(deleted.isEmpty());
+    }
 
 }
