@@ -8,10 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -52,6 +54,24 @@ public class UserServiceTest {
         assertEquals("0987654321", updated.phone());
         verify(userRepository).save(any(UserProfile.class));
     }
+    @Test
+    void testUpdateProfile_newUser() {
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(userRepository.save(any(UserProfile.class))).thenAnswer(i -> i.getArgument(0));
+        UserProfileUpdateDTO updateDTO = new UserProfileUpdateDTO("New User", "1112223333");
+        UserProfileDTO updated = userService.updateProfile(userId, updateDTO);
+        assertEquals("New User", updated.fullName());
+        assertEquals("1112223333", updated.phone());
+        verify(userRepository).save(any(UserProfile.class));
+    }
+    @Test
+    void testGetProfile_userNotFound() {
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> userService.getProfile(userId));
+    }
+
 
 
 }
