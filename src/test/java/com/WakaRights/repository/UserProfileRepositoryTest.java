@@ -31,5 +31,11 @@ public class UserProfileRepositoryTest {
         assertEquals("1234567890", retrieved.get().getPhone());
 
     }
+    @Test
+    void testFindByUserId_notFound() {
+        UUID userId = UUID.randomUUID();
+        Optional<UserProfile> retrieved = userProfileRepository.findByUserId(userId);
+        assertTrue(retrieved.isEmpty());
+    }
 
 }
