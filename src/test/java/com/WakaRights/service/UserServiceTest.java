@@ -1,19 +1,18 @@
 package com.WakaRights.service;
 
 import com.WakaRights.dto.UserProfileDTO;
+import com.WakaRights.dto.UserProfileUpdateDTO;
 import com.WakaRights.model.UserProfile;
 import com.WakaRights.repository.UserProfileRepository;
-import com.WakaRights.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
 
@@ -38,5 +37,21 @@ public class UserServiceTest {
         assertEquals("John Doe", dto.fullName());
         assertEquals("1234567890", dto.phone());
     }
+    @Test
+    void testUpdateProfile_existingUser() {
+        UUID userId = UUID.randomUUID();
+        UserProfile user = new UserProfile();
+        user.setUserId(userId);
+        user.setFullName("John Doe");
+        user.setPhone("1234567890");
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserProfile.class))).thenAnswer(i -> i.getArgument(0));
+        UserProfileUpdateDTO updateDTO = new UserProfileUpdateDTO("Jane Doe", "0987654321");
+        UserProfileDTO updated = userService.updateProfile(userId, updateDTO);
+        assertEquals("Jane Doe", updated.fullName());
+        assertEquals("0987654321", updated.phone());
+        verify(userRepository).save(any(UserProfile.class));
+    }
+
 
 }
