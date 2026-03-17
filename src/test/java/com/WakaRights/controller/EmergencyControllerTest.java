@@ -93,15 +93,12 @@ public class EmergencyControllerTest {
 
     @Test
     void escalate_nullUser_shouldFail() throws Exception {
-
         UUID evidenceId = UUID.randomUUID();
-
         String json = """
         {
             "evidenceId": "%s"
         }
         """.formatted(evidenceId);
-
         mockMvc.perform(post("/api/emergency/escalate")
                         .contentType("application/json")
                         .content(json))

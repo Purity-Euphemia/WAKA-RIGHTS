@@ -22,6 +22,9 @@ public class EmergencyController {
     @PostMapping("/escalate")
     public String escalate(@AuthenticationPrincipal UserPrincipal user,
                            @RequestBody EmergencyRequestDTO dto) {
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
         service.escalate(user.getId(), dto.evidenceId());
         return "Case sent to lawyers/NGOs";
     }
