@@ -1,27 +1,32 @@
 package com.WakaRights.controller;
 
 import com.WakaRights.dto.EmergencyRequestDTO;
+import com.WakaRights.security.SecurityConfig;
 import com.WakaRights.security.UserPrincipal;
 import com.WakaRights.service.EmergencyService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class EmergencyControllerTest {
 
+public class EmergencyControllerTest {
     private MockMvc mockMvc;
     private FakeEmergencyService fakeService;
 
-    // ✅ Fake service (same style as your Case test)
     static class FakeEmergencyService extends EmergencyService {
 
         boolean escalateCalled = false;
@@ -29,7 +34,7 @@ public class EmergencyControllerTest {
         UUID receivedEvidenceId;
 
         FakeEmergencyService() {
-            super(null); // because parent needs CaseRepository
+            super(null);
         }
 
         @Override
@@ -47,6 +52,7 @@ public class EmergencyControllerTest {
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(controller)
+                .apply(springSecurity())
                 .build();
     }
 
@@ -95,13 +101,16 @@ public class EmergencyControllerTest {
     void escalate_nullUser_shouldFail() throws Exception {
         UUID evidenceId = UUID.randomUUID();
         String json = """
-        {
-            "evidenceId": "%s"
-        }
-        """.formatted(evidenceId);
+                {
+                    "evidenceId": "%s"
+                }
+                """.formatted(evidenceId);
+
         mockMvc.perform(post("/api/emergency/escalate")
                         .contentType("application/json")
                         .content(json))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isUnauthorized());
+
+        assertEquals(false, fakeService.escalateCalled);
     }
 }
