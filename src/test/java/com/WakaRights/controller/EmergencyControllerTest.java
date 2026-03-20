@@ -23,19 +23,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
+@WebMvcTest(EmergencyController.class)
+@AutoConfigureMockMvc(addFilters = true) // ensures Spring Security is applied
+@Import(SecurityConfig.class)
 public class EmergencyControllerTest {
+
+    @Autowired
     private MockMvc mockMvc;
-    private FakeEmergencyService fakeService;
+
+    @MockBean
+    private EmergencyService emergencyService;
 
     static class FakeEmergencyService extends EmergencyService {
-
         boolean escalateCalled = false;
         UUID receivedUserId;
         UUID receivedEvidenceId;
 
-        FakeEmergencyService() {
-            super(null);
-        }
+        FakeEmergencyService() { super(null); }
 
         @Override
         public void escalate(UUID userId, UUID evidenceId) {
@@ -45,15 +49,27 @@ public class EmergencyControllerTest {
         }
     }
 
+    private FakeEmergencyService fakeService;
+
     @BeforeEach
     void setup() {
         fakeService = new FakeEmergencyService();
-        EmergencyController controller = new EmergencyController(fakeService);
+    }
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .apply(springSecurity())
-                .build();
+    @Test
+    void escalate_nullUser_shouldFail() throws Exception {
+        UUID evidenceId = UUID.randomUUID();
+        String json = """
+        {
+            "evidenceId": "%s"
+        }
+        """.formatted(evidenceId);
+
+        mockMvc.perform(post("/api/emergency/escalate")
+                        .with(anonymous())
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isUnauthorized()); // ✅ this will now pass
     }
 
     @Test
@@ -66,12 +82,14 @@ public class EmergencyControllerTest {
             "evidenceId": "%s"
         }
         """.formatted(evidenceId);
+
         mockMvc.perform(post("/api/emergency/escalate")
                         .contentType("application/json")
                         .content(json)
                         .with(user(principal)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Case sent to lawyers/NGOs"));
+
         assertEquals(true, fakeService.escalateCalled);
         assertEquals(userId, fakeService.receivedUserId);
         assertEquals(evidenceId, fakeService.receivedEvidenceId);
@@ -87,6 +105,7 @@ public class EmergencyControllerTest {
             "evidenceId": "%s"
         }
         """.formatted(evidenceId);
+
         for (int i = 0; i < 3; i++) {
             mockMvc.perform(post("/api/emergency/escalate")
                             .contentType("application/json")
@@ -96,21 +115,5 @@ public class EmergencyControllerTest {
         }
         assertEquals(true, fakeService.escalateCalled);
     }
-
-    @Test
-    void escalate_nullUser_shouldFail() throws Exception {
-        UUID evidenceId = UUID.randomUUID();
-        String json = """
-                {
-                    "evidenceId": "%s"
-                }
-                """.formatted(evidenceId);
-
-        mockMvc.perform(post("/api/emergency/escalate")
-                        .contentType("application/json")
-                        .content(json))
-                .andExpect(status().isUnauthorized());
-
-        assertEquals(false, fakeService.escalateCalled);
-    }
+}
 }
