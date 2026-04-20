@@ -34,7 +34,7 @@ spring:
 # JWT CONFIGURATION
 # -----------------------
 jwt:
-  secret: your_super_secret_jwt_key_here
+  secret: CHANGE_THIS_SECRET_TO_A_STRONG_SECRET_AT_LEAST_32_CHARACTERS_LONG
   expiration-ms: 86400000
 
 # -----------------------
@@ -44,7 +44,7 @@ logging:
   level:
     root: INFO
     org.springframework: INFO
-    com.wakarights: DEBUG
+    com.WakaRights: DEBUG
 
 # -----------------------
 # SERVER CONFIG

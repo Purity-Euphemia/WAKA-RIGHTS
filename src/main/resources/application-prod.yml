@@ -1,0 +1,22 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/wakarights}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+
+jwt:
+  secret: ${JWT_SECRET:CHANGE_THIS_SECRET_AT_LEAST_32_CHARACTERS_LONG}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.WakaRights: INFO
+
+server:
+  port: 8080
